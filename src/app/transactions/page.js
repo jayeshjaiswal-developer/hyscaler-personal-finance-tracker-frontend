@@ -111,6 +111,7 @@ export default function Transactions() {
               <tr>
                 <th className='p-[8px]'>Id</th>
                 <th>Date</th>
+                 <th>Type</th>
                 <th>Description</th>
                 <th>Amount</th>
               </tr>
@@ -161,7 +162,8 @@ function SourceRow({ prop, index, getTransactionsFunction }) {
     <tr className='border-y-2 border-y-gray-400'>
       <td className=' p-[8px]'>{index + 1}</td>
       <td>{prop.date}</td>
-      <td>{prop.type}-{prop.type == "Income" ? prop.source : prop.description}</td>
+      <td>{prop.type}</td>
+      <td>{prop.type == "Income" ? prop.source : prop.description}</td>
       <td>{prop.amount}</td>
 
     </tr>

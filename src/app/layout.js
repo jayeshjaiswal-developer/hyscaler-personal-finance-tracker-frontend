@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/common/Header";
 // import MainContext from "./context/MainContext";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./redux/store";
 import AdminLayout, { HomePage } from "./AdminLayout";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -12,6 +12,8 @@ import Footer from "@/common/Footer";
 import Login from "./auth/login/page";
 import { useEffect, useState } from "react";
 import LoginBasedLayout from "./LoginBasedLayout";
+import { addUserToken } from "./redux/reducers/userSlice";
+import { AppWrapper } from "./AppWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,23 +39,31 @@ export default function RootLayout({ children }) {
   //     </body>
   //   </html>
   // );
-      let [showHomePage, setShowHomePage] = useState(true);
-          // const user = useSelector((state) => state.user.token);
-          // const user = JSON.parse(localStorage.getItem('jwt-token'));
-          
-          // if(typeof window !== "undefined"){
-          //      const user = JSON.parse(localStorage.getItem("jwt-token"));
-          // }
+  let [showHomePage, setShowHomePage] = useState(true);
+  // const user = useSelector((state) => state.user.token);
+  // const user = JSON.parse(localStorage.getItem('jwt-token'));
+
+  // if(typeof window !== "undefined"){
+  //      const user = JSON.parse(localStorage.getItem("jwt-token"));
+  // }
+
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   let token = localStorage.getItem('jwt-token');
+  //   // console.log("This is token: "+ tokenStr);
+  //   if(token){
+  //     dispatch(addUserToken(token));
+  //   }
+  // }, [])
 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+
         <Provider store={store}>
-            <Header/>
-              <LoginBasedLayout>
+          <AppWrapper>
             {children}
-            </LoginBasedLayout>
-            <Footer/>
+          </AppWrapper>
         </Provider>
       </body>
     </html>

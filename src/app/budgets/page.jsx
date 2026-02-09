@@ -22,6 +22,8 @@ export default function Budgets() {
   const router = useRouter();
   const dispatch = useDispatch();
   let [budgetsArray, setBudgetsArray] = useState([]);
+  let [isAddBudgeBtnClicked, setIsAddBudgetBtnClicked] = useState(false);
+
 
 
   useEffect(() => {
@@ -29,69 +31,25 @@ export default function Budgets() {
     getBudgets();
   }, [])
 
-  function getBudgets() {
-    // axios.get(`${backendBaseUrl}/product/view-product`)
-    //   .then(res => res.data)
-    //   .then(finalRes => {
-    //     console.log(finalRes.message);
-    //     setProductArray(finalRes.data);
-    //   }).catch((error) => {
-    //     console.log(error);
-    //     console.log("something went xrong in frontend");
-    //   })
- const budgetsArray = [
-  {
-    id: 1,
-    category: "Shopping",
-    totalBudget: 2500,
-    spent: 600,
-    remaining: 1900,
-  },
-  {
-    id: 2,
-    category: "Food",
-    totalBudget: 4000,
-    spent: 1200,
-    remaining: 2800,
-  },
-  {
-    id: 3,
-    category: "Travel",
-    totalBudget: 3000,
-    spent: 1500,
-    remaining: 1500,
-  },
-  {
-    id: 4,
-    category: "Rent",
-    totalBudget: 10000,
-    spent: 10000,
-    remaining: 0,
-  },
-  {
-    id: 5,
-    category: "Entertainment",
-    totalBudget: 2000,
-    spent: 700,
-    remaining: 1300,
-  },
-  {
-    id: 6,
-    category: "Health",
-    totalBudget: 1500,
-    spent: 500,
-    remaining: 1000,
-  },
-];
+    function getBudgets() {
+    let lcToken = localStorage.getItem("jwt-token");
+    let token = lcToken.substring(1, lcToken.length - 1);
+    console.log(token);
 
-
-  setBudgetsArray(budgetsArray)
-
+    axios.get(`${backendBaseUrl}/api/budget`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        let budgets = res.data;
+        setBudgetsArray(budgets)
+      }).catch(err => {
+        console.log(err);
+      })
   }
 
-  let handleAddCategoryBtn = () => {
-    dispatch(showLinearBar());
-    router.push('/add/product');
+  let handleAddBudgetBtn = (event) => {
+    event.preventDefault();
+    setIsAddBudgetBtnClicked(true);
   }
 
 
@@ -99,13 +57,22 @@ export default function Budgets() {
   return (
     <>
       <div>
-        <ToastContainer />
+          <ToastContainer />
         <div className='flex justify-between items-center mb-[20px]'>
         <h1 className='font-bold text-[22px] mb-[20px]'>Budgets</h1>
-          <button className='bg-blue-500 text-white py-[4px] rounded-[15px] px-[10px] cursor-pointer' onClick={handleAddCategoryBtn}>+Add Budgets</button>
+        {
+            !isAddBudgeBtnClicked ?
+          <button className='bg-blue-500 text-white py-[4px] rounded-[15px] px-[10px] cursor-pointer' onClick={handleAddBudgetBtn}>+Add Budgets</button>
+              :
+              ''
+          }          
+          
         </div>
-        <AddBudget/>
-        <div className='px-[20px] grid grid-cols-3 gap-[10px]'>
+        {
+          isAddBudgeBtnClicked ? <AddBudget setIsAddBudgetBtnClickedFunction={setIsAddBudgetBtnClicked} getBudgetsFunction={getBudgets} /> : ''
+        }
+
+        <div className='px-[20px] mt-[10px] pt-[10px] border-t grid grid-cols-3 gap-[10px]'>
             {
               // productArray.length != 0?
               // false?
@@ -155,36 +122,72 @@ export default function Budgets() {
 
 function BudgetCard({ prop }) {
     return (
-            <div className={`shadow-lg p-[15px]`}>
+            <div className='shadow-lg p-[15px] cursor-pointer'>
               <div className='flex items-start gap-[20px]'>
                     <div className='flex justify-center items-center text-[55px] bg-blue-500 rounded-[50%] w-[60px] h-[60px] text-white'>
                         {/* {prop.icon} */}
                     </div>
 
                     <div className='flex gap-[5px] items-center justify-between text-[20px] grow'>
-                        <h1 className='font-bold'>{prop.category}</h1>
-                        <h2 className='flex items-center'><MdCurrencyRupee/>{prop.totalBudget}</h2>
+                        <h1 className='font-bold'>{prop.budgetTitle}</h1>
+                        <h2 className='flex items-center'><MdCurrencyRupee/>{prop.budgetTargetAmount}</h2>
                     </div>
               </div>
               <div className='mt-[10px]'>
               <div className='flex items-center justify-between text-[12px]'>
-                <h3 className='flex items-center'><MdCurrencyRupee/>{prop.spent} Spent</h3>
-                <h3 className='flex items-center'><MdCurrencyRupee/>{prop.remaining} Remaining</h3>
+                <h3 className='flex items-center'><MdCurrencyRupee/>{prop.budgetSpentAmount} Spent</h3>
+                <h3 className='flex items-center'><MdCurrencyRupee/>{prop.budgetTargetAmount-prop.budgetSpentAmount} Remaining</h3>
               </div>
-              <ProgressBar value={(prop.spent/prop.totalBudget)*100} style={{ height: "8px" }} showValue={false} />
+              <ProgressBar value={(prop.budgetSpentAmount/prop.budgetTargetAmount)*100} style={{ height: "8px" }} showValue={false} />
               </div>
             </div>
     )
 }
 
-function AddBudget(){
+function AddBudget({setIsAddBudgetBtnClickedFunction, getBudgetsFunction}){
+  let handleBudgetSubmit = (event)=>{
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const formDataObject = {};
+    formData.forEach((value, key) => formDataObject[key] = value);
+
+    console.log(formDataObject);
+    let lcToken = localStorage.getItem("jwt-token");
+    let token = lcToken.substring(1, lcToken.length - 1);
+
+    axios.post(`${backendBaseUrl}/api/budget/add`, formDataObject, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        let data = res.data;
+        let status = res.status;
+        let message = data.message;
+        // let savedSource = data.data;
+
+        // console.log(data);
+        // console.log(message);
+        if (res.status == 201) {
+          console.log("Budget added successfully");
+          success(toast, message);
+          getBudgetsFunction();
+          setTimeout(() => {
+            setIsAddBudgetBtnClickedFunction(false);
+          }, 5000);
+        }
+      }).catch(err => {
+        console.log(err);
+        error(toast, "Something went xrong");
+      })
+
+
+  }
   return(
     <div>
       <h1 className='font-bold'>New Budget</h1>
-      <form className='flex justify-between w-[75%] gap-[5px] px-[20px] p-[5px]'>
+      <form className='flex justify-between w-[75%] gap-[5px] px-[20px] p-[5px]' onSubmit={handleBudgetSubmit}>
     
-        <input className='border grow outline-0 px-[10px] py-[5x]' placeholder='Enter buget title'/>
-        <input className='border grow outline-0 px-[10px] py-[5x]' placeholder='Enter total budget'/>
+        <input className='border grow outline-0 px-[10px] py-[5x]' name='budgetTitle' autoFocus={true}  placeholder='Enter buget title'/>
+        <input className='border grow outline-0 px-[10px] py-[5x]' name='budgetTargetAmount' placeholder='Enter total budget'/>
         {/* <select className='outline-0 border'>
           <option>Daily</option>
           <option>Weekly</option>

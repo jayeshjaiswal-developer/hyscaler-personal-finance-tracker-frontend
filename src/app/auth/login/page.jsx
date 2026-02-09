@@ -183,21 +183,21 @@ export default function Login() {
     let [isResendOtpClicked, setResendOtpClicked] = useState(false);
 
     let hanldeResendOtp = () => {
-        console.log("Resend Otp btn clicked");
-        setResendOtpClicked(true);
-        axios.post(`${backendBaseUrl}/user/resend-login-otp`, { email: userEmail })
-            .then(res => res.data)
-            .then(finalRes => {
-                console.log(finalRes);
-                if (finalRes.status) {
-                    success(toast, finalRes.message);
-                    setResendOtpClicked(false);
-                    setCount(5);
-                } else {
-                    error(toast, finalRes.message);
-                    setResendOtpClicked(false);
-                }
-            })
+        // console.log("Resend Otp btn clicked");
+        // setResendOtpClicked(true);
+        // axios.post(`${backendBaseUrl}/user/resend-login-otp`, { email: userEmail })
+        //     .then(res => res.data)
+        //     .then(finalRes => {
+        //         console.log(finalRes);
+        //         if (finalRes.status) {
+        //             success(toast, finalRes.message);
+        //             setResendOtpClicked(false);
+        //             setCount(5);
+        //         } else {
+        //             error(toast, finalRes.message);
+        //             setResendOtpClicked(false);
+        //         }
+        //     })
     }
 
     return (
