@@ -146,8 +146,7 @@ function AddIncomeSource({ setIsAddSourceBtnClickedFunction, getSourcesFunction 
     const formData = new FormData(event.target);
     const formDataObject = {};
     formData.forEach((value, key) => formDataObject[key] = value);
-    //  console.log(formDataObject);
-
+     console.log(formDataObject);
 
     let lcToken = localStorage.getItem("jwt-token");
     // console.log(lcToken);
@@ -180,10 +179,9 @@ function AddIncomeSource({ setIsAddSourceBtnClickedFunction, getSourcesFunction 
         console.log(err);
         error(toast, "Something went xrong");
       })
-
   }
-const frequencyArray = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
-
+// const frequencyArray = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+const frequencyArray = ["DAILY", "WEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"];
   return (
     <div>
       <ToastContainer />
